@@ -1,40 +1,32 @@
 package pojo;
 
 public class Customer {
-	private String customerName;
-	private String customerPhone;
-	private String customerAddress;
-	private String customerBirth;
-
+	private String name;
+	private String phone;
+	private String address;
+	private String birth;
 	public String getName() {
-		return customerName;
+		return name;
 	}
-
 	public void setName(String name) {
-		this.customerName = name;
+		this.name = name;
 	}
-
 	public String getPhone() {
-		return customerPhone;
+		return phone;
 	}
-
-	public void setPhone(String phoneNum) {
-		this.customerPhone = phoneNum;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
-
 	public String getAddress() {
-		return customerAddress;
+		return address;
 	}
-
-	public void setAddress(String addr) {
-		this.customerAddress = addr;
+	public void setAddress(String address) {
+		this.address = address;
 	}
-
 	public String getBirth() {
-		return customerBirth;
+		return birth;
 	}
-
-	public void setBirth(String birthday) {
-		this.customerBirth = birthday;
+	public void setBirth(String birth) {
+		this.birth = birth;
 	}
 }

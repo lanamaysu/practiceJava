@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import pojo.Customer;
+
 public class CsvReader {
 
 	public static void main(String[] args) {
@@ -45,10 +47,10 @@ class FileInOut {
 	}
 	
 	public String fileToObj(String inputFile) {
-	    List<pojo.Customer> customers = new ArrayList<pojo.Customer>();
+	    List<Customer> customers = new ArrayList<Customer>();
 		List<String> lines = readFile(inputFile);
 		for (String data : lines) {
-			pojo.Customer thisCustomer = new pojo.Customer();
+			Customer thisCustomer = new Customer();
 			String[] thisLine = splitComma(data);
 			thisCustomer.setName(thisLine[0]);
 			thisCustomer.setPhone(thisLine[1]);
@@ -89,9 +91,9 @@ class FileInOut {
 		return thisLine.replaceAll(SPLIT_REG, seperator) + "\n";
 	}
 	
-	public String formatListObj(List<pojo.Customer> customers) {
+	public String formatListObj(List<Customer> customers) {
 		StringBuilder allLine = new StringBuilder();
-		for (pojo.Customer data : customers) {
+		for (Customer data : customers) {
 			allLine.append(data.getName()).append(":");
 			allLine.append(data.getPhone()).append("--");
 			allLine.append(data.getAddress()).append("\t");
