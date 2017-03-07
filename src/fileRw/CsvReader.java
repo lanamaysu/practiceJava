@@ -1,65 +1,104 @@
 package fileRw;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-public class csvReader {
+public class CsvReader {
 
 	public static void main(String[] args) {
 		FileInOut fileInOut = new FileInOut();
-		String formattedData = fileInOut.readFileAll("file/input.txt");
+		String formattedData = fileInOut.fileToString("file/input.txt");
 		fileInOut.writeFile(formattedData, "file/output.txt");
+		
+		String formattedData2 = fileInOut.fileToObj("file/inputBirthday.txt");
+		fileInOut.writeFile(formattedData2, "file/outputBirthday.txt");
 	}
 }
 
 class FileInOut {
-	public String readFileAll(String inputFile) {
-		String allLine = "";
-		try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
-			String thisLine;
-			while ((thisLine = br.readLine()) != null) {
-				// allLine += formatData(splitComma(thisLine), "\n") + "\n";
-				allLine += formatDataReplace(thisLine, "\n") + "\n";
-			}
-			System.out.println(allLine);
-			
+	final String SPLIT_REG = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+	final String SYSSP = System.lineSeparator();
+	
+	public List<String> readFile(String inputFile) {
+		List<String> lines = null;
+		try {
+			lines = Files.readAllLines(Paths.get(inputFile), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return allLine;
+		return lines;
 	}
 	
+	public String fileToString(String inputFile) {
+		StringBuilder allLine = new StringBuilder();
+		List<String> lines = readFile(inputFile);
+		for (String data : lines) {
+			allLine.append(formatDataReplace(data, "\n")).append("\n");
+		}
+		return allLine.toString();
+	}
+	
+	public String fileToObj(String inputFile) {
+	    List<pojo.Customer> customers = new ArrayList<pojo.Customer>();
+		List<String> lines = readFile(inputFile);
+		for (String data : lines) {
+			pojo.Customer thisCustomer = new pojo.Customer();
+			String[] thisLine = splitComma(data);
+			thisCustomer.setName(thisLine[0]);
+			thisCustomer.setPhone(thisLine[1]);
+			thisCustomer.setAddress(thisLine[2]);
+			thisCustomer.setBirth(thisLine[3]);
+			customers.add(thisCustomer);
+		}
+		// System.out.println(formatListObj(customers));
+		return formatListObj(customers);
+	}
+
 	public void writeFile(String input, String outputFile) {
-		try(PrintWriter output = new PrintWriter(outputFile)){
+		try (PrintWriter output = new PrintWriter(outputFile)) {
+			output.println(new Date().toString() + SYSSP);
 			output.print(changeLineSeparator(input));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	final String regex = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
-	final String thisSysLineSp = System.lineSeparator();
-	
+
 	public String[] splitComma(String inputLine) {
-		return inputLine.split(regex);
+		return inputLine.split(SPLIT_REG);
 	}
-	
+
 	public String changeLineSeparator(String original) {
-		return original.replaceAll("\n", thisSysLineSp);
+		return original.replaceAll("\n", SYSSP);
 	}
 
 	public String formatData(String[] thisDataArr, String seperator) {
 		String returnLine = "";
-		for(int i = 0; i < thisDataArr.length; i++) {
+		for (int i = 0; i < thisDataArr.length; i++) {
 			returnLine += thisDataArr[i] + seperator;
 		}
 		return returnLine;
 	}
 
 	public String formatDataReplace(String thisLine, String seperator) {
-		return thisLine.replaceAll(regex, seperator) + "\n";
+		return thisLine.replaceAll(SPLIT_REG, seperator) + "\n";
+	}
+	
+	public String formatListObj(List<pojo.Customer> customers) {
+		StringBuilder allLine = new StringBuilder();
+		for (pojo.Customer data : customers) {
+			allLine.append(data.getName()).append(":");
+			allLine.append(data.getPhone()).append("--");
+			allLine.append(data.getAddress()).append("\t");
+			allLine.append(data.getBirth().replaceAll("-", "/")).append("\n");
+			allLine.append("\n");
+		}
+		return allLine.toString();
 	}
 
 }
