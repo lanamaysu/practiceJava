@@ -73,7 +73,7 @@ class FileInOut {
   }
 
   public String[] splitComma(String inputLine) {
-    return inputLine.split(SPLIT_REG);
+    return inputLine.split(SPLIT_REG, -1);
   }
 
   public String changeLineSeparator(String original) {
