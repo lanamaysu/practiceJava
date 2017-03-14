@@ -5,9 +5,17 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+//import java.time.LocalDate;
+//import java.time.Period;
+
+
+
 
 import pojo.Customer;
 
@@ -57,6 +65,7 @@ class FileInOut {
       thisCustomer.setPhone(thisLine[1]);
       thisCustomer.setAddress(thisLine[2]);
       thisCustomer.setBirth(thisLine[3]);
+      thisCustomer.setProperties(thisLine[4]);
       customers.add(thisCustomer);
     }
     // System.out.println(formatListObj(customers));
@@ -94,14 +103,45 @@ class FileInOut {
 
   public String formatListObj(List<Customer> customers) {
     StringBuilder allLine = new StringBuilder();
+    allLine.append(String.format("%6s | %8s | %10s | %3s | %26s | %15s\n", "Name", "Phone", "Birth", "Age", "Address", "Properties"));
     for (Customer data : customers) {
-      allLine.append(data.getName()).append(":");
-      allLine.append(data.getPhone()).append("--");
-      allLine.append(data.getBirth().replaceAll("-", "/")).append("\n");
-      allLine.append(data.getAddress()).append("\n");
-      allLine.append("\n");
+      allLine.append(String.format("%5s | %8s | %10s | %3d | %20s | %,15d\n", 
+          data.getName(),
+          data.getPhone(),
+          data.getBirth().replace("-", "/"),
+          countAgeOld(data.getBirth()),
+          data.getAddress(),
+          Long.parseLong(data.getProperties()) )
+      );
     }
     return allLine.toString();
+  }
+  
+//  public int countAge(String ageStr) {
+//    LocalDate birthday = LocalDate.parse(ageStr);
+//    LocalDate today = LocalDate.now();
+//    Period periodAge = Period.between(birthday, today);
+//    return periodAge.getYears();
+//  }
+  
+  public int countAgeOld(String ageStr) {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    Date birth = null;
+    try {
+      birth = sdf.parse(ageStr);
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+    Calendar today = Calendar.getInstance();
+    Calendar birthDate = Calendar.getInstance();
+    birthDate.setTime(birth);
+    int diff = today.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR);
+    if (birthDate.get(Calendar.MONTH) > today.get(Calendar.MONTH) || 
+        (birthDate.get(Calendar.MONTH) == today.get(Calendar.MONTH) && 
+        birthDate.get(Calendar.DATE) > today.get(Calendar.DATE))) {
+        diff--;
+    }
+    return diff;
   }
 
 }
